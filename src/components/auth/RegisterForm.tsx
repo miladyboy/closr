@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const RegisterForm = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ const RegisterForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +31,13 @@ const RegisterForm = () => {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // For now, just reset the form after "submission"
+      // For now, just reset the form after "submission" and redirect
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
     } catch (err) {
       setError('Failed to register. Please try again.');
       console.error(err);

@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,9 +23,12 @@ const LoginForm = () => {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // For now, just reset the form after "submission"
+      // For now, just reset the form after "submission" and redirect
       setEmail('');
       setPassword('');
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
     } catch (err) {
       setError('Failed to login. Please check your credentials.');
       console.error(err);
