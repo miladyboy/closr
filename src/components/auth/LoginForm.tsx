@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,20 +19,20 @@ const LoginForm = () => {
     setError(null);
     
     try {
-      // We'll connect with Supabase later
-      console.log('Login attempt with:', { email, password });
+      const { error: signInError } = await signIn(email, password);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (signInError) {
+        throw signInError;
+      }
       
-      // For now, just reset the form after "submission" and redirect
+      // Reset form fields
       setEmail('');
       setPassword('');
       
       // Redirect to dashboard
       router.push('/dashboard');
-    } catch (err) {
-      setError('Failed to login. Please check your credentials.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to login. Please check your credentials.');
       console.error(err);
     } finally {
       setLoading(false);

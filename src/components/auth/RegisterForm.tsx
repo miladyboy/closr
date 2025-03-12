@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 const RegisterForm = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { signUp, signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,21 +27,29 @@ const RegisterForm = () => {
     setError(null);
     
     try {
-      // We'll connect with Supabase later
-      console.log('Registration attempt with:', { email, password });
+      // Register user with Supabase
+      const { error: signUpError } = await signUp(email, password);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (signUpError) {
+        throw signUpError;
+      }
       
-      // For now, just reset the form after "submission" and redirect
+      // Sign in after successful registration
+      const { error: signInError } = await signIn(email, password);
+      
+      if (signInError) {
+        throw signInError;
+      }
+      
+      // Reset form fields
       setEmail('');
       setPassword('');
       setConfirmPassword('');
       
       // Redirect to dashboard
       router.push('/dashboard');
-    } catch (err) {
-      setError('Failed to register. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to register. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);

@@ -3,12 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar = () => {
   const pathname = usePathname();
-  
-  // Placeholder authentication state - will connect to Supabase later
-  const isLoggedIn = pathname === '/dashboard';
+  const { user, signOut, isLoading } = useAuth();
   
   return (
     <nav className="bg-white shadow-sm">
@@ -21,7 +20,9 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            {isLoggedIn ? (
+            {isLoading ? (
+              <span className="text-sm text-gray-500">Loading...</span>
+            ) : user ? (
               <>
                 <Link 
                   href="/dashboard" 
@@ -35,14 +36,13 @@ const Navbar = () => {
                 </Link>
                 <button 
                   className="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
-                  onClick={() => {
-                    // Will implement logout with Supabase later
-                    console.log('Logging out');
-                    window.location.href = '/';
-                  }}
+                  onClick={() => signOut()}
                 >
                   Logout
                 </button>
+                <span className="text-sm text-gray-500">
+                  {user.email}
+                </span>
               </>
             ) : (
               <>
